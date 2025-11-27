@@ -1,12 +1,13 @@
 
-import 'package:cdx_bootstrap/ui/custom_button.dart';
-import 'package:cdx_bootstrap/ui/divider.dart';
 import 'package:cdx_comments/l10n/app_localizations.dart';
+import 'package:cdx_comments/models/comments_app_actions.dart';
+import 'package:cdx_comments/models/comments_theme.dart';
+import 'package:cdx_comments/models/comments_text_style.dart';
 import 'package:cdx_comments/report/provider.dart';
 import 'package:cdx_comments/report/report.dart';
 import 'package:cdx_comments/services/comment_service.dart';
-import 'package:cdx_core/core/models/text_data.dart';
-import 'package:cdx_core/injector.dart';
+import 'package:cdx_comments/widgets/line_divider.dart';
+import 'package:cdx_comments/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -15,6 +16,9 @@ class ReportCommentBottomSheet extends StatelessWidget {
   final String userId;
   final Function() onUserBlocked;
   final CommentService service;
+  final CommentsTheme? theme;
+  final CommentsAppActions? appActions;
+  final CommentsTextStyle? textStyle;
 
   const ReportCommentBottomSheet({
     super.key,
@@ -22,11 +26,27 @@ class ReportCommentBottomSheet extends StatelessWidget {
     required this.userId,
     required this.onUserBlocked,
     required this.service,
+    this.theme,
+    this.appActions,
+    this.textStyle,
   });
+
+  CommentsTheme _getTheme(BuildContext context) {
+    return theme ?? DefaultCommentsTheme(context);
+  }
+
+  CommentsTextStyle _getTextStyle(BuildContext context) {
+    return textStyle ?? DefaultCommentsTextStyle(context);
+  }
+
+  CommentsAppActions _getAppActions() {
+    return appActions ?? DefaultCommentsAppActions();
+  }
 
   @override
   Widget build(BuildContext context) {
     final loc = CdxCommentsLocalizations.of(context)!;
+    final commentsTheme = _getTheme(context);
     return DraggableScrollableSheet(
         expand: false,
         initialChildSize: 0.8,
@@ -35,8 +55,8 @@ class ReportCommentBottomSheet extends StatelessWidget {
         builder: (context, scrollController) {
           return Container(
               decoration: BoxDecoration(
-                color: DI.colors().mainText,
-                borderRadius: BorderRadius.vertical(top: DI.theme().radius.card.topRight),
+                color: commentsTheme.mainText,
+                borderRadius: commentsTheme.cardRadius,
               ),
               child: SafeArea(child: _content(context, loc))
           );
@@ -44,16 +64,19 @@ class ReportCommentBottomSheet extends StatelessWidget {
     );
   }
 
-  TextData get _data => TextData(color: DI.colors().mainBackground);
-
   Widget _content(BuildContext context, CdxCommentsLocalizations loc) {
+    final commentsTheme = _getTheme(context);
+    final commentsTextStyle = _getTextStyle(context);
     return Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: DI.app().bold18(loc.report, data: _data),
+            child: Text(
+              loc.report,
+              style: commentsTextStyle.bold18(color: commentsTheme.mainBackground),
+            ),
           ),
-          LineDivider(color: DI.colors().mainBackground.withValues(alpha: 0.2)),
+          LineDivider(color: commentsTheme.mainBackground.withOpacity(0.2)),
           Expanded(
               child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
@@ -81,15 +104,23 @@ class ReportCommentBottomSheet extends StatelessWidget {
   }
 
   Widget _reportReason(BuildContext context, CdxCommentsLocalizations loc, CommentReportProvider provider) {
+    final commentsTheme = _getTheme(context);
+    final commentsTextStyle = _getTextStyle(context);
     return Column(
         mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          DI.app().bold18(loc.q_report_comment, data: _data),
+          Text(
+            loc.q_report_comment,
+            style: commentsTextStyle.bold18(color: commentsTheme.mainBackground),
+          ),
           const SizedBox(height: 16),
           for (final reason in reportReasons)
             ListTile(
-              title: DI.app().normal14(reason.label, data: _data),
+              title: Text(
+                reason.label,
+                style: commentsTextStyle.normal14(color: commentsTheme.mainBackground),
+              ),
               leading: Radio<ReportReason>(
                 value: reason,
                 groupValue: provider.selectedReason,
@@ -112,22 +143,34 @@ class ReportCommentBottomSheet extends StatelessWidget {
   }
 
   Widget _reportUser(BuildContext context, CdxCommentsLocalizations loc, CommentReportProvider provider) {
+    final commentsTheme = _getTheme(context);
+    final commentsTextStyle = _getTextStyle(context);
+    final actions = _getAppActions();
     return Column(
       mainAxisSize: MainAxisSize.max,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        DI.app().bold18(loc.q_report_user, data: _data),
+        Text(
+          loc.q_report_user,
+          style: commentsTextStyle.bold18(color: commentsTheme.mainBackground),
+        ),
         const SizedBox(height: 16),
         CheckboxListTile(
           value: provider.reportUser,
           onChanged: provider.toggleReportUser,
-          title: DI.app().normal15(loc.report_user, data: _data),
+          title: Text(
+            loc.report_user,
+            style: commentsTextStyle.normal15(color: commentsTheme.mainBackground),
+          ),
         ),
         const SizedBox(height: 16),
         CheckboxListTile(
           value: provider.blockUser,
           onChanged: provider.toggleBlockUser,
-          title: DI.app().normal15(loc.block_user, data: _data),
+          title: Text(
+            loc.block_user,
+            style: commentsTextStyle.normal15(color: commentsTheme.mainBackground),
+          ),
         ),
         const Spacer(),
         Selector<CommentReportProvider, bool>(
@@ -138,7 +181,7 @@ class ReportCommentBottomSheet extends StatelessWidget {
                 await provider.submitReport(commentId, userId);
                 if (context.mounted) {
                   Navigator.pop(context);
-                  DI.app().showInfoSnackbar(context, loc.report_done);
+                  actions.showInfoSnackbar(context, loc.report_done);
                 }
               },
               text: loc.end,

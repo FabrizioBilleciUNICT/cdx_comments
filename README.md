@@ -192,15 +192,100 @@ class MyHomePage extends StatelessWidget {
 }
 ```
 
+## Customization
+
+### Theme Customization
+
+The package supports optional theme customization through the `CommentsTheme` interface:
+
+```dart
+class MyCustomTheme implements CommentsTheme {
+  @override
+  Color get primary => Colors.blue;
+
+  @override
+  Color get mainText => Colors.white;
+
+  @override
+  Color get mainBackground => Colors.black;
+
+  @override
+  Color get error => Colors.red;
+
+  @override
+  Color get minorText => Colors.grey;
+
+  @override
+  BorderRadius get cardRadius => BorderRadius.circular(20);
+}
+```
+
+If not provided, the package uses `DefaultCommentsTheme` which extracts colors from `Theme.of(context)`.
+
+### App Actions Customization
+
+Customize snackbars and dialogs through the `CommentsAppActions` interface:
+
+```dart
+class MyCustomAppActions implements CommentsAppActions {
+  @override
+  void showErrorSnackbar(BuildContext context, String message) {
+    // Your custom implementation
+  }
+
+  @override
+  void showInfoSnackbar(BuildContext context, String message) {
+    // Your custom implementation
+  }
+
+  @override
+  void showConfirmationDialog({
+    required BuildContext context,
+    required String title,
+    required String message,
+    required String confirmText,
+    required String cancelText,
+    required void Function(bool) onConfirm,
+  }) {
+    // Your custom implementation
+  }
+}
+```
+
+### Text Style Customization
+
+Customize text styles through the `CommentsTextStyle` interface:
+
+```dart
+class MyCustomTextStyle implements CommentsTextStyle {
+  final BuildContext context;
+  
+  const MyCustomTextStyle(this.context);
+
+  @override
+  TextStyle bold18({Color? color, TextAlign? align}) {
+    return TextStyle(
+      fontSize: 18,
+      fontWeight: FontWeight.bold,
+      color: color ?? Theme.of(context).colorScheme.onSurface,
+      // Add your custom styling
+    );
+  }
+  
+  // Implement other methods...
+}
+```
+
 ## Architecture
 
 The package follows a clean architecture pattern:
 
-- **Models**: Data classes (`Comment`, `UserInfo`, `CommentConfig`)
+- **Models**: Data classes (`Comment`, `UserInfo`, `CommentConfig`, `CommentsTheme`, `CommentsAppActions`, `CommentsTextStyle`)
 - **Services**: Abstract interfaces (`CommentService`, `FeatureChecker`)
 - **Controllers**: Business logic (`CommentController`)
 - **Providers**: State management (`CommentProvider`, `CommentReportProvider`)
 - **Validators**: Input validation (`CommentValidator`)
+- **Widgets**: UI components (`CommentBottomSheet`, `CommentTile`, `PrimaryButton`, `LineDivider`)
 - **Widgets**: UI components (`CommentBottomSheet`, `CommentTile`)
 
 ## Adding Custom Translations

@@ -1,8 +1,9 @@
-import 'package:cdx_bootstrap/ui/divider.dart';
 import 'package:cdx_comments/l10n/app_localizations.dart';
-import 'package:cdx_core/core/models/text_data.dart';
-import 'package:cdx_core/injector.dart';
-import 'package:cdx_core/utils/extensions.dart';
+import 'package:cdx_comments/models/comments_app_actions.dart';
+import 'package:cdx_comments/models/comments_theme.dart';
+import 'package:cdx_comments/models/comments_text_style.dart';
+import 'package:cdx_comments/utils/date_formatter.dart';
+import 'package:cdx_comments/widgets/line_divider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -17,6 +18,9 @@ class CommentBottomSheet extends StatelessWidget {
   final FeatureChecker featureChecker;
   final CommentService service;
   final UserInfo user;
+  final CommentsTheme? theme;
+  final CommentsAppActions? appActions;
+  final CommentsTextStyle? textStyle;
   
   const CommentBottomSheet({
     super.key,
@@ -24,16 +28,30 @@ class CommentBottomSheet extends StatelessWidget {
     required this.featureChecker,
     required this.service,
     required this.user,
+    this.theme,
+    this.appActions,
+    this.textStyle,
   });
 
   void _onInputError(BuildContext context, String error) {
-    DI.app().showErrorSnackbar(context, error);
+    final actions = appActions ?? DefaultCommentsAppActions();
+    actions.showErrorSnackbar(context, error);
+  }
+
+  CommentsTheme _getTheme(BuildContext context) {
+    return theme ?? DefaultCommentsTheme(context);
+  }
+
+  CommentsTextStyle _getTextStyle(BuildContext context) {
+    return textStyle ?? DefaultCommentsTextStyle(context);
   }
 
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<CommentProvider>();
     final loc = CdxCommentsLocalizations.of(context)!;
+    final commentsTheme = _getTheme(context);
+    final commentsTextStyle = _getTextStyle(context);
     return DraggableScrollableSheet(
       expand: false,
       initialChildSize: 0.8,
@@ -43,16 +61,19 @@ class CommentBottomSheet extends StatelessWidget {
         return Scaffold(
           body: Container(
             decoration: BoxDecoration(
-              color: DI.colors().mainText,
-              borderRadius: BorderRadius.vertical(top: DI.theme().radius.card.topRight),
+              color: commentsTheme.mainText,
+              borderRadius: commentsTheme.cardRadius,
             ),
             child: Column(
               children: [
                 Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: DI.app().bold18(loc.comments, data: TextData(color: DI.colors().mainBackground)),
+                  child: Text(
+                    loc.comments,
+                    style: commentsTextStyle.bold18(color: commentsTheme.mainBackground),
+                  ),
                 ),
-                LineDivider(color: DI.colors().mainBackground.withValues(alpha: 0.2)),
+                LineDivider(color: commentsTheme.mainBackground.withOpacity(0.2)),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
@@ -77,6 +98,8 @@ class CommentBottomSheet extends StatelessWidget {
                                     onReply: userBlockedUntil != null ? (){} : () => provider.setReplyTo(comment),
                                     onExpand: () => provider.expandReplies(comment.id),
                                     onUserBlocked: () => provider.loadComments(),
+                                    theme: theme,
+                                    appActions: appActions,
                                   ),
                                   ...comment.replies.map((reply) => Padding(
                                     padding: const EdgeInsets.only(left: 32.0),
@@ -89,6 +112,8 @@ class CommentBottomSheet extends StatelessWidget {
                                       onDelete: reply.isMine ? () => provider.deleteReply(comment.id, reply.id) : null,
                                       onReply: userBlockedUntil != null ? (){} : () => provider.setReplyTo(comment),
                                       onUserBlocked: () => provider.loadComments(),
+                                      theme: theme,
+                                      appActions: appActions,
                                     ),
                                   )),
                                   const SizedBox(height: 8),
@@ -99,7 +124,7 @@ class CommentBottomSheet extends StatelessWidget {
                         ),
                         if (provider.replyingTo != null)
                           Container(
-                            color: DI.colors().mainBackground.withValues(alpha: 0.15),
+                            color: commentsTheme.mainBackground.withOpacity(0.15),
                             child: Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0),
                               child: Row(
@@ -123,19 +148,21 @@ class CommentBottomSheet extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                               child: Row(
                                 children: [
-                                  CircleAvatar(backgroundColor: DI.colors().primary, child: Text(user.initials)),
+                                  CircleAvatar(backgroundColor: commentsTheme.primary, child: Text(user.initials)),
                                   const SizedBox(width: 8),
                                   if (userBlockedUntil != null)
                                     Expanded(child: Container(
                                       padding: const EdgeInsets.all(8),
                                       decoration: BoxDecoration(
-                                        color: DI.colors().minorText.withValues(alpha: 0.1),
+                                        color: commentsTheme.minorText.withOpacity(0.1),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
-                                      child: DI.app().normal12(
-                                          '${loc.blocked_until} '
-                                              '${userBlockedUntil!.format('dd/MM/yyyy HH:mm', 'it')}',
-                                          data: TextData(color: DI.colors().minorText, align: TextAlign.center)
+                                      child: Text(
+                                        '${loc.blocked_until} ${DateFormatter.format(userBlockedUntil!, 'dd/MM/yyyy HH:mm', locale: 'it')}',
+                                        style: commentsTextStyle.normal12(
+                                          color: commentsTheme.minorText,
+                                        ),
+                                        textAlign: TextAlign.center,
                                       ),
                                     ))
                                   else Expanded(

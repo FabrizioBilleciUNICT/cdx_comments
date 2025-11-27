@@ -1,6 +1,7 @@
 
 import 'package:cdx_comments/l10n/app_localizations.dart';
-import 'package:cdx_core/injector.dart';
+import 'package:cdx_comments/models/comments_app_actions.dart';
+import 'package:cdx_comments/models/comments_theme.dart';
 import 'package:flutter/material.dart';
 import '../models/comment.dart';
 import '../models/module_features.dart';
@@ -16,6 +17,8 @@ class CommentTile extends StatelessWidget {
   final void Function()? onReply;
   final void Function()? onExpand;
   final void Function() onUserBlocked;
+  final CommentsTheme? theme;
+  final CommentsAppActions? appActions;
 
   const CommentTile({
     super.key,
@@ -27,20 +30,31 @@ class CommentTile extends StatelessWidget {
     this.onReply,
     this.onExpand,
     required this.onUserBlocked,
+    this.theme,
+    this.appActions,
   });
 
+  CommentsTheme _getTheme(BuildContext context) {
+    return theme ?? DefaultCommentsTheme(context);
+  }
+
+  CommentsAppActions _getAppActions() {
+    return appActions ?? DefaultCommentsAppActions();
+  }
+
   void _delete(BuildContext context, CdxCommentsLocalizations loc) {
-    DI.app().openConfirmationDialog(
-        context,
-        title: loc.delete_comment,
-        message: loc.q_delete_comment,
-        confirmText: loc.confirm,
-        cancelText: loc.cancel,
-        confirm: (confirm) {
-          if (confirm) {
-            onDelete?.call();
-          }
+    final actions = _getAppActions();
+    actions.showConfirmationDialog(
+      context: context,
+      title: loc.delete_comment,
+      message: loc.q_delete_comment,
+      confirmText: loc.confirm,
+      cancelText: loc.cancel,
+      onConfirm: (confirm) {
+        if (confirm) {
+          onDelete?.call();
         }
+      },
     );
   }
 
@@ -53,6 +67,9 @@ class CommentTile extends StatelessWidget {
         userId: comment.userId,
         onUserBlocked: onUserBlocked,
         service: service,
+        theme: theme,
+        appActions: appActions,
+        textStyle: null, // Will use default
       ),
     );
   }
@@ -74,7 +91,7 @@ class CommentTile extends StatelessWidget {
         if (onDelete != null)
           PopupMenuItem(
             value: () => _delete(context, loc),
-            child: Text(loc.delete, style: TextStyle(color: DI.colors().error))
+            child: Text(loc.delete, style: TextStyle(color: _getTheme(context).error))
           ),
         PopupMenuItem(
             value: () => _report(context, loc),
@@ -87,6 +104,7 @@ class CommentTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final loc = CdxCommentsLocalizations.of(context)!;
+    final commentsTheme = _getTheme(context);
     return Padding(
       padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
       child: Column(
@@ -98,7 +116,7 @@ class CommentTile extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CircleAvatar(backgroundColor: DI.colors().primary, child: Text(comment.initials)),
+                  CircleAvatar(backgroundColor: commentsTheme.primary, child: Text(comment.initials)),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Column(
@@ -115,7 +133,7 @@ class CommentTile extends StatelessWidget {
                                 loc.answer,
                                 style: TextStyle(
                                     fontSize: 12,
-                                    color: DI.colors().mainBackground.withValues(alpha: 0.5)
+                                    color: commentsTheme.mainBackground.withOpacity(0.5)
                                 )
                             ),
                           )
@@ -146,7 +164,7 @@ class CommentTile extends StatelessWidget {
               onPressed: onExpand,
               child: Text(
                   loc.view_replies(comment.replyCount ?? 0),
-                  style: TextStyle(color: DI.colors().mainBackground.withValues(alpha: 0.5))
+                  style: TextStyle(color: commentsTheme.mainBackground.withOpacity(0.5))
               ),
             )
         ],

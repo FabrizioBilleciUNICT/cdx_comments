@@ -13,15 +13,8 @@ dependencies:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
-
-  cdx_core:
-    path: ../cdx_core
-  cdx_bootstrap:
-    path: ../cdx_bootstrap
   provider: ^6.1.5+1
 
-dependency_overrides:
-  intl: any
 
 dev_dependencies:
   flutter_test:
