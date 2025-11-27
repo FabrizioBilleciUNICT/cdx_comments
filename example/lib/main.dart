@@ -126,15 +126,27 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class CommentsPage extends StatelessWidget {
+class CommentsPage extends StatefulWidget {
   const CommentsPage({super.key});
+
+  @override
+  State<CommentsPage> createState() => _CommentsPageState();
+}
+
+class _CommentsPageState extends State<CommentsPage> {
+  late final FeatureChecker _featureChecker;
+
+  @override
+  void initState() {
+    super.initState();
+    _featureChecker = ExampleFeatureChecker();
+  }
 
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<CommentProvider>();
     final service = (provider.controller.service as ExampleCommentService);
     final user = provider.controller.user;
-    final featureChecker = ExampleFeatureChecker();
 
     return Scaffold(
       appBar: AppBar(
@@ -144,7 +156,7 @@ class CommentsPage extends StatelessWidget {
         provider: provider,
         service: service,
         user: user,
-        featureChecker: featureChecker,
+        featureChecker: _featureChecker,
       ),
     );
   }

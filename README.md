@@ -166,35 +166,52 @@ import 'package:cdx_comments/cdx_comments.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class CommentsPage extends StatelessWidget {
+class CommentsPage extends StatefulWidget {
   final String postId;
   
   const CommentsPage({super.key, required this.postId});
   
   @override
-  Widget build(BuildContext context) {
-    // Setup services
-    final service = MyCommentService();
-    final config = CommentConfig(
+  State<CommentsPage> createState() => _CommentsPageState();
+}
+
+class _CommentsPageState extends State<CommentsPage> {
+  late final CommentService _service;
+  late final CommentConfig _config;
+  late final UserInfo _user;
+  late final CommentController _controller;
+  late final CommentValidator _validator;
+  late final FeatureChecker _featureChecker;
+  
+  @override
+  void initState() {
+    super.initState();
+    
+    // Setup services - in a real app, these might come from dependency injection
+    _service = MyCommentService();
+    _config = CommentConfig(
       badWords: 'bad\nword\nlist', // Your bad words list
     );
-    final user = UserInfo(
+    _user = UserInfo(
       uuid: 'current-user-id',
       name: 'Current User',
     );
-    final controller = CommentController(
-      service: service,
-      config: config,
-      user: user,
+    _controller = CommentController(
+      service: _service,
+      config: _config,
+      user: _user,
     );
-    final validator = CommentValidator(badWordsData: config.badWords);
-    final featureChecker = MyFeatureChecker();
-    
+    _validator = CommentValidator(badWordsData: _config.badWords);
+    _featureChecker = MyFeatureChecker();
+  }
+  
+  @override
+  Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => CommentProvider(
-        controller: controller,
-        postId: postId,
-        validator: validator,
+        controller: _controller,
+        postId: widget.postId,
+        validator: _validator,
       ),
       child: Scaffold(
         appBar: AppBar(title: const Text('Comments')),
@@ -206,15 +223,48 @@ class CommentsPage extends StatelessWidget {
                 isScrollControlled: true,
                 builder: (_) => CommentBottomSheet(
                   userBlockedUntil: null, // Set if user is blocked
-                  featureChecker: featureChecker,
-                  service: service,
-                  user: user,
+                  featureChecker: _featureChecker,
+                  service: _service,
+                  user: _user,
                 ),
               );
             },
             child: const Text('Show Comments'),
           ),
         ),
+      ),
+    );
+  }
+}
+```
+
+**Alternative using Dependency Injection** (recommended for larger apps):
+
+```dart
+// Using a DI container (e.g., get_it, riverpod, etc.)
+class CommentsPage extends StatelessWidget {
+  final String postId;
+  
+  const CommentsPage({super.key, required this.postId});
+  
+  @override
+  Widget build(BuildContext context) {
+    // Get services from DI container
+    final service = GetIt.instance<CommentService>();
+    final config = GetIt.instance<CommentConfig>();
+    final user = GetIt.instance<UserInfo>();
+    final controller = GetIt.instance<CommentController>();
+    final validator = GetIt.instance<CommentValidator>();
+    final featureChecker = GetIt.instance<FeatureChecker>();
+    
+    return ChangeNotifierProvider(
+      create: (_) => CommentProvider(
+        controller: controller,
+        postId: postId,
+        validator: validator,
+      ),
+      child: Scaffold(
+        // ... rest of the widget
       ),
     );
   }
