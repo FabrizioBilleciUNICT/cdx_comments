@@ -1,11 +1,15 @@
 
+import 'package:cdx_comments/l10n/app_localizations.dart';
 import 'package:cdx_core/injector.dart';
 import 'package:flutter/material.dart';
 import '../models/comment.dart';
+import '../models/module_features.dart';
 import '../report/sheet.dart';
+import '../services/comment_service.dart';
 
 class CommentTile extends StatelessWidget {
-  final DataService ds;
+  final FeatureChecker featureChecker;
+  final CommentService service;
   final Comment comment;
   final void Function()? onLike;
   final void Function()? onDelete;
@@ -15,7 +19,8 @@ class CommentTile extends StatelessWidget {
 
   const CommentTile({
     super.key,
-    required this.ds,
+    required this.featureChecker,
+    required this.service,
     required this.comment,
     this.onLike,
     this.onDelete,
@@ -24,13 +29,14 @@ class CommentTile extends StatelessWidget {
     required this.onUserBlocked,
   });
 
-  void _delete(BuildContext context, AppLocalizations loc) {
-    AppUtils.openConfirmationDialog(
+  void _delete(BuildContext context, CdxCommentsLocalizations loc) {
+    DI.app().openConfirmationDialog(
         context,
-        loc.delete_comment,
-        loc.q_delete_comment,
-        loc.confirm,
-        (confirm) {
+        title: loc.delete_comment,
+        message: loc.q_delete_comment,
+        confirmText: loc.confirm,
+        cancelText: loc.cancel,
+        confirm: (confirm) {
           if (confirm) {
             onDelete?.call();
           }
@@ -38,7 +44,7 @@ class CommentTile extends StatelessWidget {
     );
   }
 
-  void _report(BuildContext context, AppLocalizations loc) {
+  void _report(BuildContext context, CdxCommentsLocalizations loc) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -46,11 +52,12 @@ class CommentTile extends StatelessWidget {
         commentId: comment.id,
         userId: comment.userId,
         onUserBlocked: onUserBlocked,
+        service: service,
       ),
     );
   }
 
-  void _showMenu(BuildContext context, AppLocalizations loc, TapDownDetails details) {
+  void _showMenu(BuildContext context, CdxCommentsLocalizations loc, TapDownDetails details) {
     final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
     final Offset tapPosition = details.globalPosition;
 
@@ -79,7 +86,7 @@ class CommentTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context)!;
+    final loc = CdxCommentsLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
       child: Column(
@@ -101,7 +108,7 @@ class CommentTile extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text(comment.content),
                         const SizedBox(height: 4),
-                        if (ds.commentHasFeature(ModuleFeature.comment))
+                        if (featureChecker.commentHasFeature(ModuleFeature.comment))
                           GestureDetector(
                             onTap: onReply,
                             child: Text(
@@ -116,7 +123,7 @@ class CommentTile extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  if (ds.commentHasInsight(ModuleInsight.likeCount))
+                  if (featureChecker.commentHasInsight(ModuleInsight.likeCount))
                     IconButton(
                       icon: Column(
                         children: [
@@ -127,7 +134,7 @@ class CommentTile extends StatelessWidget {
                           Text(comment.likeCount?.toString() ?? ''),
                         ],
                       ),
-                      onPressed: ds.commentHasFeature(ModuleFeature.like) ? onLike : null,
+                      onPressed: featureChecker.commentHasFeature(ModuleFeature.like) ? onLike : null,
                     ),
                 ],
               ),

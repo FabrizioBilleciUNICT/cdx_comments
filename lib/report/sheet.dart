@@ -1,8 +1,10 @@
 
 import 'package:cdx_bootstrap/ui/custom_button.dart';
 import 'package:cdx_bootstrap/ui/divider.dart';
+import 'package:cdx_comments/l10n/app_localizations.dart';
 import 'package:cdx_comments/report/provider.dart';
 import 'package:cdx_comments/report/report.dart';
+import 'package:cdx_comments/services/comment_service.dart';
 import 'package:cdx_core/core/models/text_data.dart';
 import 'package:cdx_core/injector.dart';
 import 'package:flutter/material.dart';
@@ -12,17 +14,19 @@ class ReportCommentBottomSheet extends StatelessWidget {
   final String commentId;
   final String userId;
   final Function() onUserBlocked;
+  final CommentService service;
 
   const ReportCommentBottomSheet({
     super.key,
     required this.commentId,
     required this.userId,
     required this.onUserBlocked,
+    required this.service,
   });
 
   @override
   Widget build(BuildContext context) {
-    final loc = AppLocalizations.of(context)!;
+    final loc = CdxCommentsLocalizations.of(context)!;
     return DraggableScrollableSheet(
         expand: false,
         initialChildSize: 0.8,
@@ -42,7 +46,7 @@ class ReportCommentBottomSheet extends StatelessWidget {
 
   TextData get _data => TextData(color: DI.colors().mainBackground);
 
-  Widget _content(BuildContext context, AppLocalizations loc) {
+  Widget _content(BuildContext context, CdxCommentsLocalizations loc) {
     return Column(
         children: [
           Padding(
@@ -54,7 +58,7 @@ class ReportCommentBottomSheet extends StatelessWidget {
               child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
                   child: ChangeNotifierProvider(
-                    create: (_) => CommentReportProvider(DataService(), onUserBlocked),
+                    create: (_) => CommentReportProvider(service, onUserBlocked),
                     child: Builder(
                         builder: (context) {
                           return Consumer<CommentReportProvider>(
@@ -76,7 +80,7 @@ class ReportCommentBottomSheet extends StatelessWidget {
     );
   }
 
-  Widget _reportReason(BuildContext context, AppLocalizations loc, CommentReportProvider provider) {
+  Widget _reportReason(BuildContext context, CdxCommentsLocalizations loc, CommentReportProvider provider) {
     return Column(
         mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -107,7 +111,7 @@ class ReportCommentBottomSheet extends StatelessWidget {
     );
   }
 
-  Widget _reportUser(BuildContext context, AppLocalizations loc, CommentReportProvider provider) {
+  Widget _reportUser(BuildContext context, CdxCommentsLocalizations loc, CommentReportProvider provider) {
     return Column(
       mainAxisSize: MainAxisSize.max,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -134,7 +138,7 @@ class ReportCommentBottomSheet extends StatelessWidget {
                 await provider.submitReport(commentId, userId);
                 if (context.mounted) {
                   Navigator.pop(context);
-                  AppUtils.showInfoSnackbar(context, loc.report_done);
+                  DI.app().showInfoSnackbar(context, loc.report_done);
                 }
               },
               text: loc.end,

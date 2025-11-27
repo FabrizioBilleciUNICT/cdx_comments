@@ -1,0 +1,49 @@
+{
+  "@@locale": "it",
+  "comments": "Commenti",
+  "add_a_comment": "Aggiungi un commento...",
+  "answer": "Rispondi",
+  "answer_to": "Rispondi a",
+  "delete": "Elimina",
+  "delete_comment": "Elimina commento",
+  "q_delete_comment": "Sei sicuro di voler eliminare questo commento?",
+  "confirm": "Conferma",
+  "cancel": "Annulla",
+  "report": "Segnala",
+  "q_report_comment": "Perché stai segnalando questo commento?",
+  "q_report_user": "Cosa vuoi fare?",
+  "report_user": "Segnala utente",
+  "block_user": "Blocca utente",
+  "next": "Avanti",
+  "end": "Invia",
+  "report_done": "Segnalazione inviata con successo",
+  "blocked_until": "Bloccato fino al",
+  "view_replies": "Visualizza {count} risposte",
+  "@view_replies": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "comment_empty": "Il commento non può essere vuoto",
+  "comment_too_many_lines": "Il commento non può superare {maxLines} righe",
+  "@comment_too_many_lines": {
+    "placeholders": {
+      "maxLines": {
+        "type": "int"
+      }
+    }
+  },
+  "comment_too_long": "Il commento non può superare {maxLength} caratteri",
+  "@comment_too_long": {
+    "placeholders": {
+      "maxLength": {
+        "type": "int"
+      }
+    }
+  },
+  "comment_dangerous": "Il commento contiene contenuti pericolosi",
+  "comment_bad_words": "Il commento contiene parole inappropriate"
+}
+

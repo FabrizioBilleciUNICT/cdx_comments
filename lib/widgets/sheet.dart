@@ -1,26 +1,39 @@
 import 'package:cdx_bootstrap/ui/divider.dart';
+import 'package:cdx_comments/l10n/app_localizations.dart';
 import 'package:cdx_core/core/models/text_data.dart';
 import 'package:cdx_core/injector.dart';
 import 'package:cdx_core/utils/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import '../models/module_features.dart';
+import '../models/user_info.dart';
 import '../provider.dart';
+import '../services/comment_service.dart';
 import 'comment_tile.dart';
 
 class CommentBottomSheet extends StatelessWidget {
   final DateTime? userBlockedUntil;
-  const CommentBottomSheet({super.key, required this.userBlockedUntil});
+  final FeatureChecker featureChecker;
+  final CommentService service;
+  final UserInfo user;
+  
+  const CommentBottomSheet({
+    super.key,
+    required this.userBlockedUntil,
+    required this.featureChecker,
+    required this.service,
+    required this.user,
+  });
 
   void _onInputError(BuildContext context, String error) {
-    AppUtils.showErrorSnackbar(context, error);
+    DI.app().showErrorSnackbar(context, error);
   }
 
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<CommentProvider>();
-    final DataService ds = DataService();
-    final loc = AppLocalizations.of(context)!;
+    final loc = CdxCommentsLocalizations.of(context)!;
     return DraggableScrollableSheet(
       expand: false,
       initialChildSize: 0.8,
@@ -56,7 +69,8 @@ class CommentBottomSheet extends StatelessWidget {
                                 children: [
                                   CommentTile(
                                     key: ValueKey(comment.id),
-                                    ds: ds,
+                                    featureChecker: featureChecker,
+                                    service: service,
                                     comment: comment,
                                     onLike: () => provider.toggleLike(comment.id),
                                     onDelete: comment.isMine ? () => provider.deleteComment(comment.id) : null,
@@ -68,7 +82,8 @@ class CommentBottomSheet extends StatelessWidget {
                                     padding: const EdgeInsets.only(left: 32.0),
                                     child: CommentTile(
                                       key: ValueKey(reply.id),
-                                      ds: ds,
+                                      featureChecker: featureChecker,
+                                      service: service,
                                       comment: reply,
                                       onLike: () => provider.toggleReplyLike(comment.id, reply.id),
                                       onDelete: reply.isMine ? () => provider.deleteReply(comment.id, reply.id) : null,
@@ -102,13 +117,13 @@ class CommentBottomSheet extends StatelessWidget {
                               ),
                             ),
                           ),
-                        if (ds.commentHasFeature(ModuleFeature.comment))
+                        if (featureChecker.commentHasFeature(ModuleFeature.comment))
                           SafeArea(
                             child: Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                               child: Row(
                                 children: [
-                                  CircleAvatar(backgroundColor: DI.colors().primary, child: Text(DataService().user?.initials ?? '??')),
+                                  CircleAvatar(backgroundColor: DI.colors().primary, child: Text(user.initials)),
                                   const SizedBox(width: 8),
                                   if (userBlockedUntil != null)
                                     Expanded(child: Container(

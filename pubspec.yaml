@@ -1,7 +1,8 @@
 name: cdx_comments
-description: "Cdx Comments module"
+description: A Flutter package for managing comments with support for replies, likes, reporting, and user blocking.
 version: 0.0.1
-homepage:
+homepage: https://github.com/yourusername/cdx_comments
+repository: https://github.com/yourusername/cdx_comments
 
 environment:
   sdk: ^3.10.1
@@ -10,11 +11,13 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   cdx_core:
-    path: ../../cdx_core
+    path: ../cdx_core
   cdx_bootstrap:
-    path: ../../cdx_bootstrap
+    path: ../cdx_bootstrap
   provider: ^6.1.5+1
 
 dependency_overrides:
@@ -30,6 +33,7 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  generate: true
 
   # To add assets to your package, add an assets section, like this:
   # assets:

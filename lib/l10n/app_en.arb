@@ -1,0 +1,115 @@
+{
+  "@@locale": "en",
+  "comments": "Comments",
+  "@comments": {
+    "description": "Title for comments section"
+  },
+  "add_a_comment": "Add a comment...",
+  "@add_a_comment": {
+    "description": "Placeholder text for comment input field"
+  },
+  "answer": "Reply",
+  "@answer": {
+    "description": "Button text to reply to a comment"
+  },
+  "answer_to": "Replying to",
+  "@answer_to": {
+    "description": "Label showing who you are replying to"
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "Delete action label"
+  },
+  "delete_comment": "Delete comment",
+  "@delete_comment": {
+    "description": "Title for delete comment dialog"
+  },
+  "q_delete_comment": "Are you sure you want to delete this comment?",
+  "@q_delete_comment": {
+    "description": "Confirmation question for deleting a comment"
+  },
+  "confirm": "Confirm",
+  "@confirm": {
+    "description": "Confirm button text"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Cancel button text"
+  },
+  "report": "Report",
+  "@report": {
+    "description": "Report action label"
+  },
+  "q_report_comment": "Why are you reporting this comment?",
+  "@q_report_comment": {
+    "description": "Question for reporting a comment"
+  },
+  "q_report_user": "What do you want to do?",
+  "@q_report_user": {
+    "description": "Question for reporting a user"
+  },
+  "report_user": "Report user",
+  "@report_user": {
+    "description": "Checkbox label for reporting a user"
+  },
+  "block_user": "Block user",
+  "@block_user": {
+    "description": "Checkbox label for blocking a user"
+  },
+  "next": "Next",
+  "@next": {
+    "description": "Next button text"
+  },
+  "end": "Submit",
+  "@end": {
+    "description": "Submit button text"
+  },
+  "report_done": "Report submitted successfully",
+  "@report_done": {
+    "description": "Success message after submitting a report"
+  },
+  "blocked_until": "Blocked until",
+  "@blocked_until": {
+    "description": "Label showing when user is blocked until"
+  },
+  "view_replies": "View {count} replies",
+  "@view_replies": {
+    "description": "Button text to view replies",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "comment_empty": "Comment cannot be empty",
+  "@comment_empty": {
+    "description": "Error message when comment is empty"
+  },
+  "comment_too_many_lines": "Comment cannot exceed {maxLines} lines",
+  "@comment_too_many_lines": {
+    "description": "Error message when comment has too many lines",
+    "placeholders": {
+      "maxLines": {
+        "type": "int"
+      }
+    }
+  },
+  "comment_too_long": "Comment cannot exceed {maxLength} characters",
+  "@comment_too_long": {
+    "description": "Error message when comment is too long",
+    "placeholders": {
+      "maxLength": {
+        "type": "int"
+      }
+    }
+  },
+  "comment_dangerous": "Comment contains dangerous content",
+  "@comment_dangerous": {
+    "description": "Error message when comment contains dangerous content"
+  },
+  "comment_bad_words": "Comment contains inappropriate words",
+  "@comment_bad_words": {
+    "description": "Error message when comment contains bad words"
+  }
+}
+
