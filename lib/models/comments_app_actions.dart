@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'comment.dart';
+import 'user_info.dart';
 
 /// Callbacks for app-level actions like showing snackbars and dialogs.
 ///
@@ -27,6 +29,16 @@ abstract class CommentsAppActions {
     required String cancelText,
     required void Function(bool) onConfirm,
   });
+
+  /// Builds a custom avatar widget for the given [comment].
+  ///
+  /// Return `null` to fallback to the default avatar.
+  Widget? buildCommentAvatar(BuildContext context, Comment comment);
+
+  /// Builds a custom avatar widget for the current user (used in the input field).
+  ///
+  /// Return `null` to fallback to the default avatar.
+  Widget? buildUserAvatar(BuildContext context, UserInfo user);
 }
 
 /// Default implementation of [CommentsAppActions] using Flutter's standard widgets.
@@ -87,5 +99,11 @@ class DefaultCommentsAppActions implements CommentsAppActions {
       ),
     );
   }
+
+  @override
+  Widget? buildCommentAvatar(BuildContext context, Comment comment) => null;
+
+  @override
+  Widget? buildUserAvatar(BuildContext context, UserInfo user) => null;
 }
 

@@ -1,6 +1,6 @@
 name: cdx_comments
 description: A Flutter package for managing comments with support for replies, likes, reporting, and user blocking.
-version: 0.0.1
+version: 0.0.2
 homepage: https://github.com/FabrizioBilleciUNICT/cdx_comments
 repository: https://github.com/FabrizioBilleciUNICT/cdx_comments
 

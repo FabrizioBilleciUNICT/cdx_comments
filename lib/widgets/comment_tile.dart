@@ -1,4 +1,3 @@
-
 import 'package:cdx_comments/l10n/app_localizations.dart';
 import 'package:cdx_comments/models/comments_app_actions.dart';
 import 'package:cdx_comments/models/comments_theme.dart';
@@ -42,6 +41,16 @@ class CommentTile extends StatelessWidget {
     return appActions ?? DefaultCommentsAppActions();
   }
 
+  Widget _buildAvatar(BuildContext context, CommentsTheme commentsTheme) {
+    final customAvatar =
+        _getAppActions().buildCommentAvatar(context, comment);
+    if (customAvatar != null) return customAvatar;
+    return CircleAvatar(
+      backgroundColor: commentsTheme.primary,
+      child: Text(comment.initials),
+    );
+  }
+
   void _delete(BuildContext context, CdxCommentsLocalizations loc) {
     final actions = _getAppActions();
     actions.showConfirmationDialog(
@@ -74,28 +83,36 @@ class CommentTile extends StatelessWidget {
     );
   }
 
-  void _showMenu(BuildContext context, CdxCommentsLocalizations loc, TapDownDetails details) {
-    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+  void _showMenu(
+    BuildContext context,
+    CdxCommentsLocalizations loc,
+    TapDownDetails details,
+  ) {
+    final RenderBox overlay =
+        Overlay.of(context).context.findRenderObject() as RenderBox;
     final Offset tapPosition = details.globalPosition;
 
     showMenu<VoidCallback>(
       context: context,
       position: RelativeRect.fromRect(
-        Rect.fromPoints(
-          tapPosition,
-          tapPosition,
-        ),
+        Rect.fromPoints(tapPosition, tapPosition),
         Offset.zero & overlay.size,
       ),
       items: [
         if (onDelete != null)
           PopupMenuItem(
             value: () => _delete(context, loc),
-            child: Text(loc.delete, style: TextStyle(color: _getTheme(context).error))
+            child: Text(
+              loc.delete,
+              style: TextStyle(color: _getTheme(context).error),
+            ),
           ),
         PopupMenuItem(
-            value: () => _report(context, loc),
-            child: Text(loc.report)
+          value: () => _report(context, loc),
+          child: Text(
+            loc.report,
+            style: TextStyle(color: _getTheme(context).mainText),
+          ),
         ),
       ],
     ).then((value) => value?.call());
@@ -116,27 +133,39 @@ class CommentTile extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CircleAvatar(backgroundColor: commentsTheme.primary, child: Text(comment.initials)),
+                  _buildAvatar(context, commentsTheme),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(comment.username, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                        Text(
+                          comment.username,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                            color: commentsTheme.mainText,
+                          ),
+                        ),
                         const SizedBox(height: 4),
-                        Text(comment.content),
+                        Text(
+                          comment.content,
+                          style: TextStyle(color: commentsTheme.mainText),
+                        ),
                         const SizedBox(height: 4),
-                        if (featureChecker.commentHasFeature(ModuleFeature.comment))
+                        if (featureChecker.commentHasFeature(
+                          ModuleFeature.comment,
+                        ))
                           GestureDetector(
                             onTap: onReply,
                             child: Text(
-                                loc.answer,
-                                style: TextStyle(
-                                    fontSize: 12,
-                                    color: commentsTheme.mainBackground.withOpacity(0.5)
-                                )
+                              loc.answer,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: commentsTheme.minorText,
+                              ),
                             ),
-                          )
+                          ),
                       ],
                     ),
                   ),
@@ -146,13 +175,24 @@ class CommentTile extends StatelessWidget {
                       icon: Column(
                         children: [
                           Icon(
-                            comment.isLiked == true ? Icons.favorite : Icons.favorite_border,
-                            color: comment.isLiked == true ? Colors.red : null,
+                            comment.isLiked == true
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            color: comment.isLiked == true ? commentsTheme.primary : commentsTheme.minorText,
                           ),
-                          Text(comment.likeCount?.toString() ?? ''),
+                          Text(
+                            comment.likeCount?.toString() ?? '',
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: commentsTheme.minorText,
+                            ),
+                          ),
                         ],
                       ),
-                      onPressed: featureChecker.commentHasFeature(ModuleFeature.like) ? onLike : null,
+                      onPressed:
+                          featureChecker.commentHasFeature(ModuleFeature.like)
+                          ? onLike
+                          : null,
                     ),
                 ],
               ),
@@ -163,10 +203,12 @@ class CommentTile extends StatelessWidget {
             TextButton(
               onPressed: onExpand,
               child: Text(
-                  loc.view_replies(comment.replyCount ?? 0),
-                  style: TextStyle(color: commentsTheme.mainBackground.withOpacity(0.5))
+                loc.view_replies(comment.replyCount ?? 0),
+                style: TextStyle(
+                  color: commentsTheme.minorText,
+                ),
               ),
-            )
+            ),
         ],
       ),
     );

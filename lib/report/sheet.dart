@@ -55,7 +55,7 @@ class ReportCommentBottomSheet extends StatelessWidget {
         builder: (context, scrollController) {
           return Container(
               decoration: BoxDecoration(
-                color: commentsTheme.mainText,
+                color: commentsTheme.mainBackground,
                 borderRadius: commentsTheme.cardRadius,
               ),
               child: SafeArea(child: _content(context, loc))
@@ -73,10 +73,10 @@ class ReportCommentBottomSheet extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: Text(
               loc.report,
-              style: commentsTextStyle.bold18(color: commentsTheme.mainBackground),
+              style: commentsTextStyle.bold18(color: commentsTheme.mainText),
             ),
           ),
-          LineDivider(color: commentsTheme.mainBackground.withOpacity(0.2)),
+          LineDivider(color: commentsTheme.minorText.withOpacity(0.2)),
           Expanded(
               child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
@@ -112,14 +112,14 @@ class ReportCommentBottomSheet extends StatelessWidget {
         children: [
           Text(
             loc.q_report_comment,
-            style: commentsTextStyle.bold18(color: commentsTheme.mainBackground),
+            style: commentsTextStyle.bold18(color: commentsTheme.mainText),
           ),
           const SizedBox(height: 16),
           for (final reason in reportReasons)
             ListTile(
               title: Text(
                 reason.label,
-                style: commentsTextStyle.normal14(color: commentsTheme.mainBackground),
+                style: commentsTextStyle.normal14(color: commentsTheme.mainText),
               ),
               leading: Radio<ReportReason>(
                 value: reason,
@@ -152,7 +152,7 @@ class ReportCommentBottomSheet extends StatelessWidget {
       children: [
         Text(
           loc.q_report_user,
-          style: commentsTextStyle.bold18(color: commentsTheme.mainBackground),
+          style: commentsTextStyle.bold18(color: commentsTheme.mainText),
         ),
         const SizedBox(height: 16),
         CheckboxListTile(
@@ -160,7 +160,7 @@ class ReportCommentBottomSheet extends StatelessWidget {
           onChanged: provider.toggleReportUser,
           title: Text(
             loc.report_user,
-            style: commentsTextStyle.normal15(color: commentsTheme.mainBackground),
+            style: commentsTextStyle.normal15(color: commentsTheme.mainText),
           ),
         ),
         const SizedBox(height: 16),
@@ -169,7 +169,7 @@ class ReportCommentBottomSheet extends StatelessWidget {
           onChanged: provider.toggleBlockUser,
           title: Text(
             loc.block_user,
-            style: commentsTextStyle.normal15(color: commentsTheme.mainBackground),
+            style: commentsTextStyle.normal15(color: commentsTheme.mainText),
           ),
         ),
         const Spacer(),

@@ -46,6 +46,19 @@ class CommentBottomSheet extends StatelessWidget {
     return textStyle ?? DefaultCommentsTextStyle(context);
   }
 
+  Widget _buildUserAvatar(BuildContext context, CommentsTheme commentsTheme) {
+    final actions = appActions ?? DefaultCommentsAppActions();
+    final customAvatar = actions.buildUserAvatar(context, user);
+    if (customAvatar != null) return customAvatar;
+    return CircleAvatar(
+      backgroundColor: commentsTheme.primary,
+      child: Text(
+        user.initials,
+        style: TextStyle(color: commentsTheme.mainBackground),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<CommentProvider>();
@@ -58,22 +71,26 @@ class CommentBottomSheet extends StatelessWidget {
       minChildSize: 0.4,
       maxChildSize: 0.95,
       builder: (context, scrollController) {
-        return Scaffold(
-          body: Container(
-            decoration: BoxDecoration(
-              color: commentsTheme.mainText,
-              borderRadius: commentsTheme.cardRadius,
-            ),
-            child: Column(
-              children: [
+        return GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: Scaffold(
+            backgroundColor: commentsTheme.mainBackground,
+            body: Container(
+              decoration: BoxDecoration(
+                color: commentsTheme.mainBackground,
+                borderRadius: commentsTheme.cardRadius,
+              ),
+              child: Column(
+                children: [
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Text(
                     loc.comments,
-                    style: commentsTextStyle.bold18(color: commentsTheme.mainBackground),
+                    style: commentsTextStyle.bold18(color: commentsTheme.mainText),
                   ),
                 ),
-                LineDivider(color: commentsTheme.mainBackground.withOpacity(0.2)),
+                LineDivider(color: commentsTheme.minorText.withOpacity(0.2)),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
@@ -124,7 +141,7 @@ class CommentBottomSheet extends StatelessWidget {
                         ),
                         if (provider.replyingTo != null)
                           Container(
-                            color: commentsTheme.mainBackground.withOpacity(0.15),
+                            color: commentsTheme.minorText.withOpacity(0.1),
                             child: Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0),
                               child: Row(
@@ -132,10 +149,11 @@ class CommentBottomSheet extends StatelessWidget {
                                   Expanded(
                                     child: Text(
                                       "${loc.answer_to} ${provider.replyingTo!.username}",
+                                      style: commentsTextStyle.normal14(color: commentsTheme.mainText),
                                     ),
                                   ),
                                   IconButton(
-                                    icon: const Icon(Icons.close),
+                                    icon: Icon(Icons.close, color: commentsTheme.mainText),
                                     onPressed: () => provider.setReplyTo(null),
                                   ),
                                 ],
@@ -148,7 +166,7 @@ class CommentBottomSheet extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                               child: Row(
                                 children: [
-                                  CircleAvatar(backgroundColor: commentsTheme.primary, child: Text(user.initials)),
+                                  _buildUserAvatar(context, commentsTheme),
                                   const SizedBox(width: 8),
                                   if (userBlockedUntil != null)
                                     Expanded(child: Container(
@@ -172,20 +190,24 @@ class CommentBottomSheet extends StatelessWidget {
                                       keyboardType: TextInputType.multiline,
                                       maxLines: 5,
                                       minLines: 1,
+                                      style: commentsTextStyle.normal14(color: commentsTheme.mainText),
                                       decoration: InputDecoration(
                                         hintText: loc.add_a_comment,
+                                        hintStyle: commentsTextStyle.normal14(color: commentsTheme.minorText),
+                                        fillColor: commentsTheme.mainBackground,
+                                        filled: true,
                                         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                                         enabledBorder: OutlineInputBorder(
                                           borderRadius: BorderRadius.circular(24),
-                                          borderSide: const BorderSide(color: Colors.grey),
+                                          borderSide: BorderSide(color: commentsTheme.minorText.withOpacity(0.3)),
                                         ),
                                         focusedBorder: OutlineInputBorder(
                                           borderRadius: BorderRadius.circular(24),
-                                          borderSide: const BorderSide(color: Colors.grey),
+                                          borderSide: BorderSide(color: commentsTheme.primary),
                                         ),
                                         suffixIcon: provider.inputController.text.trim().isNotEmpty
                                             ? IconButton(
-                                          icon: const Icon(Icons.send),
+                                          icon: Icon(Icons.send, color: commentsTheme.primary),
                                           onPressed: () => provider.sendComment(loc, onInputError: (e) => _onInputError(context, e)),
                                         )
                                             : null,
@@ -199,8 +221,8 @@ class CommentBottomSheet extends StatelessWidget {
                       ],
                     ),
                   ),
-                )
-              ],
+                )],
+              ),
             ),
           ),
         );
