@@ -1,3 +1,7 @@
+## 0.0.2
+
+* Added intl dependency for date formatting and localization support
+
 ## 0.0.1
 
 * Initial release of cdx_comments package
