@@ -125,6 +125,12 @@ class ReportCommentBottomSheet extends StatelessWidget {
                 value: reason,
                 groupValue: provider.selectedReason,
                 onChanged: (val) => provider.selectReason(val!),
+                fillColor: WidgetStateProperty.resolveWith<Color>((Set<WidgetState> states) {
+                  if (states.contains(WidgetState.selected)) {
+                    return commentsTheme.primary;
+                  }
+                  return commentsTheme.minorText;
+                }),
               ),
               onTap: () => provider.selectReason(reason),
             ),
@@ -132,11 +138,14 @@ class ReportCommentBottomSheet extends StatelessWidget {
           Selector<CommentReportProvider, ReportReason?>(
               selector: (context, provider) => provider.selectedReason,
               builder: (BuildContext context, ReportReason? value, Widget? child) =>
-                  Row(children: [PrimaryButton(
+                  SizedBox(
+                    width: double.infinity,
+                    child: PrimaryButton(
                       onPressed: provider.goToNextStep,
                       text: loc.next,
                       enabled: value != null
-                  )])
+                    ),
+                  )
           )
         ]
     );
@@ -162,6 +171,13 @@ class ReportCommentBottomSheet extends StatelessWidget {
             loc.report_user,
             style: commentsTextStyle.normal15(color: commentsTheme.mainText),
           ),
+          checkboxShape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(4),
+          ),
+          side: BorderSide(
+            color: commentsTheme.minorText,
+            width: 2,
+          ),
         ),
         const SizedBox(height: 16),
         CheckboxListTile(
@@ -171,12 +187,21 @@ class ReportCommentBottomSheet extends StatelessWidget {
             loc.block_user,
             style: commentsTextStyle.normal15(color: commentsTheme.mainText),
           ),
+          checkboxShape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(4),
+          ),
+          side: BorderSide(
+            color: commentsTheme.minorText,
+            width: 2,
+          ),
         ),
         const Spacer(),
         Selector<CommentReportProvider, bool>(
           selector: (context, provider) => provider.loading,
-          builder: (BuildContext context, bool loading, Widget? child) => Row(children: [PrimaryButton(
-            loading: loading,
+          builder: (BuildContext context, bool loading, Widget? child) => SizedBox(
+            width: double.infinity,
+            child: PrimaryButton(
+              loading: loading,
               onPressed: () async {
                 await provider.submitReport(commentId, userId);
                 if (context.mounted) {
@@ -185,7 +210,8 @@ class ReportCommentBottomSheet extends StatelessWidget {
                 }
               },
               text: loc.end,
-          )]),
+            ),
+          ),
         )
       ],
     );

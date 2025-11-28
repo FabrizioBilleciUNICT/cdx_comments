@@ -91,9 +91,11 @@ class CommentTile extends StatelessWidget {
     final RenderBox overlay =
         Overlay.of(context).context.findRenderObject() as RenderBox;
     final Offset tapPosition = details.globalPosition;
+    final commentsTheme = _getTheme(context);
 
     showMenu<VoidCallback>(
       context: context,
+      color: commentsTheme.mainBackground,
       position: RelativeRect.fromRect(
         Rect.fromPoints(tapPosition, tapPosition),
         Offset.zero & overlay.size,
@@ -104,16 +106,17 @@ class CommentTile extends StatelessWidget {
             value: () => _delete(context, loc),
             child: Text(
               loc.delete,
-              style: TextStyle(color: _getTheme(context).error),
+              style: TextStyle(color: commentsTheme.error),
             ),
           ),
-        PopupMenuItem(
-          value: () => _report(context, loc),
-          child: Text(
-            loc.report,
-            style: TextStyle(color: _getTheme(context).mainText),
+        if (!comment.isMine)
+          PopupMenuItem(
+            value: () => _report(context, loc),
+            child: Text(
+              loc.report,
+              style: TextStyle(color: commentsTheme.mainText),
+            ),
           ),
-        ),
       ],
     ).then((value) => value?.call());
   }
