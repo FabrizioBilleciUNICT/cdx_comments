@@ -1,3 +1,7 @@
+## 0.0.3
+
+* Updated license copyright year to 2025
+
 ## 0.0.2
 
 * Added intl dependency for date formatting and localization support
