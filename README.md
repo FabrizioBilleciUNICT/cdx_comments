@@ -1,8 +1,16 @@
+<div align="center">
+  <img src="https://raw.githubusercontent.com/FabrizioBilleciUNICT/cdx_comments/main/cdx_comments.png" alt="CdxComments Logo" width="400">
+</div>
+
+<div align="center">
+
 # cdx_comments
 
 [![pub package](https://img.shields.io/pub/v/cdx_comments.svg)](https://pub.dev/packages/cdx_comments)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Flutter](https://img.shields.io/badge/Flutter-%3E%3D1.17.0-blue.svg)](https://flutter.dev)
+
+</div>
 
 A comprehensive Flutter package for managing comments with support for replies, likes, reporting, and user blocking. Built with a clean, extensible architecture that follows Flutter best practices and requires zero external dependencies (except `provider`).
 
