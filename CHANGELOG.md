@@ -1,3 +1,7 @@
+## 0.0.5
+
+* Fixed logo image path in README (changed from main to master branch)
+
 ## 0.0.4
 
 * Added logo image to README header

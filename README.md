@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/FabrizioBilleciUNICT/cdx_comments/main/cdx_comments.png" alt="CdxComments Logo" width="400">
+  <img src="https://raw.githubusercontent.com/FabrizioBilleciUNICT/cdx_comments/master/cdx_comments.png" alt="CdxComments Logo" width="400">
 </div>
 
 <div align="center">
