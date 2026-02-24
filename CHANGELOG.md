@@ -1,3 +1,7 @@
+## 0.0.6
+
+* Replies pagination, more styling customizations
+
 ## 0.0.5
 
 * Fixed logo image path in README (changed from main to master branch)
