@@ -81,6 +81,10 @@
       }
     }
   },
+  "load_more_replies": "Load more replies",
+  "@load_more_replies": {
+    "description": "Button to load next page of replies"
+  },
   "comment_empty": "Comment cannot be empty",
   "@comment_empty": {
     "description": "Error message when comment is empty"

@@ -69,6 +69,9 @@ class CdxCommentsLocalizationsIt extends CdxCommentsLocalizations {
   }
 
   @override
+  String get load_more_replies => 'Carica altre risposte';
+
+  @override
   String get comment_empty => 'Il commento non può essere vuoto';
 
   @override

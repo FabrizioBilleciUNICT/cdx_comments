@@ -26,6 +26,7 @@
       }
     }
   },
+  "load_more_replies": "Carica altre risposte",
   "comment_empty": "Il commento non può essere vuoto",
   "comment_too_many_lines": "Il commento non può superare {maxLines} righe",
   "@comment_too_many_lines": {
