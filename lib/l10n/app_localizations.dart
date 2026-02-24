@@ -215,6 +215,10 @@ abstract class CdxCommentsLocalizations {
   /// **'View {count} replies'**
   String view_replies(int count);
 
+  /// Button to load next page of replies
+  ///
+  /// In en, this message translates to:
+  /// **'Load more replies'**
   String get load_more_replies;
 
   /// Error message when comment is empty
