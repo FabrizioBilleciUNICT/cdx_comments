@@ -21,7 +21,11 @@ class CommentBottomSheet extends StatelessWidget {
   final CommentsTheme? theme;
   final CommentsAppActions? appActions;
   final CommentsTextStyle? textStyle;
-  
+  /// Initial sheet size as fraction of screen height (default 0.8). Use e.g. 0.7 for 10% less.
+  final double? initialChildSize;
+  /// Max sheet size as fraction of screen height (default 0.95). Use e.g. 0.85 for 10% less.
+  final double? maxChildSize;
+
   const CommentBottomSheet({
     super.key,
     required this.userBlockedUntil,
@@ -31,6 +35,8 @@ class CommentBottomSheet extends StatelessWidget {
     this.theme,
     this.appActions,
     this.textStyle,
+    this.initialChildSize,
+    this.maxChildSize,
   });
 
   void _onInputError(BuildContext context, String error) {
@@ -67,21 +73,23 @@ class CommentBottomSheet extends StatelessWidget {
     final commentsTextStyle = _getTextStyle(context);
     return DraggableScrollableSheet(
       expand: false,
-      initialChildSize: 0.8,
+      initialChildSize: initialChildSize ?? 0.8,
       minChildSize: 0.4,
-      maxChildSize: 0.95,
+      maxChildSize: maxChildSize ?? 0.95,
       builder: (context, scrollController) {
         return GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: () => FocusScope.of(context).unfocus(),
           child: Scaffold(
-            backgroundColor: commentsTheme.mainBackground,
-            body: Container(
-              decoration: BoxDecoration(
-                color: commentsTheme.mainBackground,
-                borderRadius: commentsTheme.cardRadius,
-              ),
-              child: Column(
+            backgroundColor: Colors.transparent,
+            body: ClipRRect(
+              borderRadius: commentsTheme.cardRadius,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: commentsTheme.mainBackground,
+                  borderRadius: commentsTheme.cardRadius,
+                ),
+                child: Column(
                 children: [
                 Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -99,6 +107,7 @@ class CommentBottomSheet extends StatelessWidget {
                         Expanded(
                           child: ListView.builder(
                             controller: scrollController,
+                            physics: const AlwaysScrollableScrollPhysics(),
                             itemCount: provider.comments.length,
                             itemBuilder: (context, index) {
                               final comment = provider.comments[index];
@@ -114,6 +123,7 @@ class CommentBottomSheet extends StatelessWidget {
                                     onDelete: comment.isMine ? () => provider.deleteComment(comment.id) : null,
                                     onReply: userBlockedUntil != null ? (){} : () => provider.setReplyTo(comment),
                                     onExpand: () => provider.expandReplies(comment.id),
+                                    onLoadMoreReplies: () => provider.loadMoreReplies(comment.id),
                                     onUserBlocked: () => provider.loadComments(),
                                     theme: theme,
                                     appActions: appActions,
@@ -162,8 +172,9 @@ class CommentBottomSheet extends StatelessWidget {
                           ),
                         if (featureChecker.commentHasFeature(ModuleFeature.comment))
                           SafeArea(
+                            bottom: false,
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
                               child: Row(
                                 children: [
                                   _buildUserAvatar(context, commentsTheme),
@@ -218,10 +229,12 @@ class CommentBottomSheet extends StatelessWidget {
                               ),
                             ),
                           ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                )],
+                ],
+                ),
               ),
             ),
           ),

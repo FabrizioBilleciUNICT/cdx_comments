@@ -21,6 +21,9 @@ abstract class CommentsTheme {
   /// Minor text color for secondary text.
   Color get minorText;
 
+  /// Color for like/heart icon when liked.
+  Color get likeColor;
+
   /// Border radius for card elements.
   BorderRadius get cardRadius;
 }
@@ -48,6 +51,9 @@ class DefaultCommentsTheme implements CommentsTheme {
 
   @override
   Color get minorText => Theme.of(context).colorScheme.onSurface.withOpacity(0.6);
+
+  @override
+  Color get likeColor => primary;
 
   @override
   BorderRadius get cardRadius => const BorderRadius.vertical(

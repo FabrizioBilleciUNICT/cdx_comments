@@ -143,7 +143,11 @@ class ReportCommentBottomSheet extends StatelessWidget {
                     child: PrimaryButton(
                       onPressed: provider.goToNextStep,
                       text: loc.next,
-                      enabled: value != null
+                      enabled: value != null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: commentsTheme.primary,
+                      ),
+                      foregroundColor: Colors.white,
                     ),
                   )
           )
@@ -210,6 +214,10 @@ class ReportCommentBottomSheet extends StatelessWidget {
                 }
               },
               text: loc.end,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: commentsTheme.primary,
+              ),
+              foregroundColor: Colors.white,
             ),
           ),
         )

@@ -20,6 +20,9 @@ class PrimaryButton extends StatelessWidget {
   /// Optional custom style for the button.
   final ButtonStyle? style;
 
+  /// Optional text/foreground color. Use e.g. [Colors.white] on colored background.
+  final Color? foregroundColor;
+
   const PrimaryButton({
     super.key,
     required this.onPressed,
@@ -27,6 +30,7 @@ class PrimaryButton extends StatelessWidget {
     this.enabled = true,
     this.loading = false,
     this.style,
+    this.foregroundColor,
   });
 
   @override
@@ -47,7 +51,12 @@ class PrimaryButton extends StatelessWidget {
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
               )
-            : Text(text),
+            : Text(
+                text,
+                style: foregroundColor != null
+                    ? TextStyle(color: foregroundColor)
+                    : null,
+              ),
       ),
     );
   }
