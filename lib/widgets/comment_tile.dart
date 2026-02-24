@@ -7,7 +7,7 @@ import '../models/module_features.dart';
 import '../report/sheet.dart';
 import '../services/comment_service.dart';
 
-class CommentTile extends StatelessWidget {
+class CommentTile extends StatefulWidget {
   final FeatureChecker featureChecker;
   final CommentService service;
   final Comment comment;
@@ -15,6 +15,7 @@ class CommentTile extends StatelessWidget {
   final void Function()? onDelete;
   final void Function()? onReply;
   final void Function()? onExpand;
+  final void Function()? onLoadMoreReplies;
   final void Function() onUserBlocked;
   final CommentsTheme? theme;
   final CommentsAppActions? appActions;
@@ -28,26 +29,37 @@ class CommentTile extends StatelessWidget {
     this.onDelete,
     this.onReply,
     this.onExpand,
+    this.onLoadMoreReplies,
     required this.onUserBlocked,
     this.theme,
     this.appActions,
   });
 
+  @override
+  State<CommentTile> createState() => _CommentTileState();
+}
+
+class _CommentTileState extends State<CommentTile> {
+  Offset _longPressPosition = Offset.zero;
+
   CommentsTheme _getTheme(BuildContext context) {
-    return theme ?? DefaultCommentsTheme(context);
+    return widget.theme ?? DefaultCommentsTheme(context);
   }
 
   CommentsAppActions _getAppActions() {
-    return appActions ?? DefaultCommentsAppActions();
+    return widget.appActions ?? DefaultCommentsAppActions();
   }
 
   Widget _buildAvatar(BuildContext context, CommentsTheme commentsTheme) {
     final customAvatar =
-        _getAppActions().buildCommentAvatar(context, comment);
+        _getAppActions().buildCommentAvatar(context, widget.comment);
     if (customAvatar != null) return customAvatar;
     return CircleAvatar(
       backgroundColor: commentsTheme.primary,
-      child: Text(comment.initials),
+      child: Text(
+        widget.comment.initials,
+        style: TextStyle(color: commentsTheme.mainBackground),
+      ),
     );
   }
 
@@ -61,7 +73,7 @@ class CommentTile extends StatelessWidget {
       cancelText: loc.cancel,
       onConfirm: (confirm) {
         if (confirm) {
-          onDelete?.call();
+          widget.onDelete?.call();
         }
       },
     );
@@ -72,25 +84,21 @@ class CommentTile extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       builder: (_) => ReportCommentBottomSheet(
-        commentId: comment.id,
-        userId: comment.userId,
-        onUserBlocked: onUserBlocked,
-        service: service,
-        theme: theme,
-        appActions: appActions,
-        textStyle: null, // Will use default
+        commentId: widget.comment.id,
+        userId: widget.comment.userId,
+        onUserBlocked: widget.onUserBlocked,
+        service: widget.service,
+        theme: widget.theme,
+        appActions: widget.appActions,
+        textStyle: null,
       ),
     );
   }
 
-  void _showMenu(
-    BuildContext context,
-    CdxCommentsLocalizations loc,
-    TapDownDetails details,
-  ) {
+  void _showMenu(BuildContext context, CdxCommentsLocalizations loc, Offset position) {
     final RenderBox overlay =
         Overlay.of(context).context.findRenderObject() as RenderBox;
-    final Offset tapPosition = details.globalPosition;
+    final Offset tapPosition = position;
     final commentsTheme = _getTheme(context);
 
     showMenu<VoidCallback>(
@@ -101,7 +109,7 @@ class CommentTile extends StatelessWidget {
         Offset.zero & overlay.size,
       ),
       items: [
-        if (onDelete != null)
+        if (widget.onDelete != null)
           PopupMenuItem(
             value: () => _delete(context, loc),
             child: Text(
@@ -109,7 +117,7 @@ class CommentTile extends StatelessWidget {
               style: TextStyle(color: commentsTheme.error),
             ),
           ),
-        if (!comment.isMine)
+        if (!widget.comment.isMine)
           PopupMenuItem(
             value: () => _report(context, loc),
             child: Text(
@@ -125,12 +133,14 @@ class CommentTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = CdxCommentsLocalizations.of(context)!;
     final commentsTheme = _getTheme(context);
+    final comment = widget.comment;
     return Padding(
       padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
       child: Column(
         children: [
           GestureDetector(
-            onTapDown: (d) => _showMenu(context, loc, d),
+            onLongPressDown: (d) => setState(() => _longPressPosition = d.globalPosition),
+            onLongPress: () => _showMenu(context, loc, _longPressPosition),
             child: Container(
               color: Colors.transparent,
               child: Row(
@@ -156,11 +166,11 @@ class CommentTile extends StatelessWidget {
                           style: TextStyle(color: commentsTheme.mainText),
                         ),
                         const SizedBox(height: 4),
-                        if (featureChecker.commentHasFeature(
+                        if (widget.featureChecker.commentHasFeature(
                           ModuleFeature.comment,
                         ))
                           GestureDetector(
-                            onTap: onReply,
+                            onTap: widget.onReply,
                             child: Text(
                               loc.answer,
                               style: TextStyle(
@@ -173,7 +183,7 @@ class CommentTile extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  if (featureChecker.commentHasInsight(ModuleInsight.likeCount))
+                  if (widget.featureChecker.commentHasInsight(ModuleInsight.likeCount))
                     IconButton(
                       icon: Column(
                         children: [
@@ -181,7 +191,7 @@ class CommentTile extends StatelessWidget {
                             comment.isLiked == true
                                 ? Icons.favorite
                                 : Icons.favorite_border,
-                            color: comment.isLiked == true ? commentsTheme.primary : commentsTheme.minorText,
+                            color: comment.isLiked == true ? commentsTheme.likeColor : commentsTheme.minorText,
                           ),
                           Text(
                             comment.likeCount?.toString() ?? '',
@@ -193,8 +203,8 @@ class CommentTile extends StatelessWidget {
                         ],
                       ),
                       onPressed:
-                          featureChecker.commentHasFeature(ModuleFeature.like)
-                          ? onLike
+                          widget.featureChecker.commentHasFeature(ModuleFeature.like)
+                          ? widget.onLike
                           : null,
                     ),
                 ],
@@ -204,12 +214,22 @@ class CommentTile extends StatelessWidget {
 
           if (comment.replies.isEmpty && (comment.replyCount ?? 0) > 0)
             TextButton(
-              onPressed: onExpand,
+              onPressed: widget.onExpand,
               child: Text(
                 loc.view_replies(comment.replyCount ?? 0),
                 style: TextStyle(
                   color: commentsTheme.minorText,
                 ),
+              ),
+            ),
+          if (comment.replies.isNotEmpty &&
+              (comment.replyCount ?? 0) > comment.replies.length &&
+              widget.onLoadMoreReplies != null)
+            TextButton(
+              onPressed: widget.onLoadMoreReplies,
+              child: Text(
+                loc.load_more_replies,
+                style: TextStyle(color: commentsTheme.minorText),
               ),
             ),
         ],

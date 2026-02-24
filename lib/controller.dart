@@ -123,15 +123,7 @@ class CommentController {
     await service.deleteComment(commentId);
   }
 
-  /// Fetches replies for a specific comment.
-  ///
-  /// Returns all direct replies to the specified comment.
-  /// This does not include nested replies (replies to replies).
-  ///
-  /// [commentId] is the ID of the parent comment.
-  ///
-  /// Returns an empty list if the comment has no replies.
-  Future<List<Comment>> getReplies(String commentId) async {
-    return await service.fetchReplies(commentId, 1);
+  Future<List<Comment>> getReplies(String commentId, [int page = 1]) async {
+    return await service.fetchReplies(commentId, page);
   }
 }

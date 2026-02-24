@@ -51,8 +51,8 @@ class CommentProvider with ChangeNotifier {
     });
   }
 
-  /// Internal list of comments.
   List<Comment> _comments = [];
+  final Map<String, int> _replyPageByComment = {};
   
   /// The list of comments for this entity.
   ///
@@ -158,21 +158,26 @@ class CommentProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Expands replies for a comment by fetching them from the server.
-  ///
-  /// Loads all replies for the specified comment and updates the comment's
-  /// [Comment.replies] list.
-  ///
-  /// [commentId] is the ID of the comment to expand replies for.
-  ///
-  /// If the comment is not found, this method does nothing.
   Future<void> expandReplies(String commentId) async {
     final index = _comments.indexWhere((c) => c.id == commentId);
     if (index != -1) {
-      final replies = await controller.getReplies(commentId);
+      final replies = await controller.getReplies(commentId, 1);
       _comments[index] = _comments[index].copyWith(replies: replies);
+      _replyPageByComment[commentId] = 1;
       notifyListeners();
     }
+  }
+
+  Future<void> loadMoreReplies(String commentId) async {
+    final index = _comments.indexWhere((c) => c.id == commentId);
+    if (index == -1) return;
+    final nextPage = (_replyPageByComment[commentId] ?? 1) + 1;
+    final more = await controller.getReplies(commentId, nextPage);
+    if (more.isEmpty) return;
+    _replyPageByComment[commentId] = nextPage;
+    final c = _comments[index];
+    _comments[index] = c.copyWith(replies: [...c.replies, ...more]);
+    notifyListeners();
   }
 
   /// Toggles the like status of a reply.
