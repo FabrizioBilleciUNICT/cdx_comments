@@ -26,6 +26,9 @@ abstract class CommentsTheme {
 
   /// Border radius for card elements.
   BorderRadius get cardRadius;
+
+  /// Pixel size for the heart icon on each comment row (default follows Material ~24).
+  double get likeIconSize;
 }
 
 /// Default implementation of [CommentsTheme] that uses [Theme.of].
@@ -57,7 +60,9 @@ class DefaultCommentsTheme implements CommentsTheme {
 
   @override
   BorderRadius get cardRadius => const BorderRadius.vertical(
-    top: Radius.circular(16),
-  );
-}
+        top: Radius.circular(16),
+      );
 
+  @override
+  double get likeIconSize => 24;
+}

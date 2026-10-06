@@ -93,9 +93,13 @@ class CommentBottomSheet extends StatelessWidget {
                 children: [
                 Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    loc.comments,
-                    style: commentsTextStyle.bold18(color: commentsTheme.mainText),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Text(
+                      loc.comments,
+                      textAlign: TextAlign.center,
+                      style: commentsTextStyle.sheetTitle(color: commentsTheme.mainText),
+                    ),
                   ),
                 ),
                 LineDivider(color: commentsTheme.minorText.withOpacity(0.2)),
@@ -126,6 +130,7 @@ class CommentBottomSheet extends StatelessWidget {
                                     onLoadMoreReplies: () => provider.loadMoreReplies(comment.id),
                                     onUserBlocked: () => provider.loadComments(),
                                     theme: theme,
+                                    textStyle: textStyle,
                                     appActions: appActions,
                                   ),
                                   ...comment.replies.map((reply) => Padding(
@@ -140,6 +145,7 @@ class CommentBottomSheet extends StatelessWidget {
                                       onReply: userBlockedUntil != null ? (){} : () => provider.setReplyTo(comment),
                                       onUserBlocked: () => provider.loadComments(),
                                       theme: theme,
+                                      textStyle: textStyle,
                                       appActions: appActions,
                                     ),
                                   )),

@@ -28,22 +28,32 @@ class UserInfo {
   ///
   /// For names with multiple words, takes the first letter of the first two words.
   /// For single words, takes the first 1-2 characters.
-  /// Returns '??' if the name is empty.
+  /// If [name] is blank, derives up to two letters from [uuid] (alphanumeric only).
   ///
   /// Examples:
   /// - "John Doe" -> "JD"
   /// - "Alice" -> "AL"
   /// - "A" -> "A"
-  /// - "" -> "??"
+  /// - "" with uuid "ab12-cd" -> "AB"
   String get initials {
-    if (name.isEmpty) return '??';
-    final words = name.trim().split(RegExp(r'\s+'));
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) {
+      return _initialsFromId(uuid);
+    }
+    final words = trimmed.split(RegExp(r'\s+'));
     if (words.length >= 2) {
       return (words[0][0] + words[1][0]).toUpperCase();
     }
-    return name.length >= 2 
-        ? name.substring(0, 2).toUpperCase()
-        : name.substring(0, 1).toUpperCase();
+    return trimmed.length >= 2
+        ? trimmed.substring(0, 2).toUpperCase()
+        : trimmed.substring(0, 1).toUpperCase();
   }
+}
+
+String _initialsFromId(String id) {
+  final alnum = id.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '');
+  if (alnum.isEmpty) return '?';
+  if (alnum.length >= 2) return alnum.substring(0, 2).toUpperCase();
+  return alnum[0].toUpperCase();
 }
 

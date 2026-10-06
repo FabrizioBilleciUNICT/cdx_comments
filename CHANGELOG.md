@@ -1,3 +1,13 @@
+## 0.1.1
+
+* [UserInfo.initials]: blank [name] now falls back to letters from [uuid] instead of a fixed placeholder.
+
+## 0.1.0
+
+* **Breaking:** [CommentsTheme] adds [likeIconSize]; [CommentsTextStyle] adds [commentUsername], [commentBody], [replyAction], [likeCount], [sheetTitle] for row-level typography.
+* Comment sheet title is full-width centered; [CommentTile] and report sheet receive the host [CommentsTextStyle].
+* Relaxed SDK constraint to `>=3.8.0 <4.0.0`.
+
 ## 0.0.6
 
 * Replies pagination, more styling customizations

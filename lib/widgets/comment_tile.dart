@@ -1,5 +1,6 @@
 import 'package:cdx_comments/l10n/app_localizations.dart';
 import 'package:cdx_comments/models/comments_app_actions.dart';
+import 'package:cdx_comments/models/comments_text_style.dart';
 import 'package:cdx_comments/models/comments_theme.dart';
 import 'package:flutter/material.dart';
 import '../models/comment.dart';
@@ -18,6 +19,7 @@ class CommentTile extends StatefulWidget {
   final void Function()? onLoadMoreReplies;
   final void Function() onUserBlocked;
   final CommentsTheme? theme;
+  final CommentsTextStyle? textStyle;
   final CommentsAppActions? appActions;
 
   const CommentTile({
@@ -32,6 +34,7 @@ class CommentTile extends StatefulWidget {
     this.onLoadMoreReplies,
     required this.onUserBlocked,
     this.theme,
+    this.textStyle,
     this.appActions,
   });
 
@@ -44,6 +47,10 @@ class _CommentTileState extends State<CommentTile> {
 
   CommentsTheme _getTheme(BuildContext context) {
     return widget.theme ?? DefaultCommentsTheme(context);
+  }
+
+  CommentsTextStyle _getTextStyle(BuildContext context) {
+    return widget.textStyle ?? DefaultCommentsTextStyle(context);
   }
 
   CommentsAppActions _getAppActions() {
@@ -90,7 +97,7 @@ class _CommentTileState extends State<CommentTile> {
         service: widget.service,
         theme: widget.theme,
         appActions: widget.appActions,
-        textStyle: null,
+        textStyle: widget.textStyle,
       ),
     );
   }
@@ -133,7 +140,9 @@ class _CommentTileState extends State<CommentTile> {
   Widget build(BuildContext context) {
     final loc = CdxCommentsLocalizations.of(context)!;
     final commentsTheme = _getTheme(context);
+    final commentsTextStyle = _getTextStyle(context);
     final comment = widget.comment;
+    final likeSize = commentsTheme.likeIconSize;
     return Padding(
       padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
       child: Column(
@@ -154,16 +163,16 @@ class _CommentTileState extends State<CommentTile> {
                       children: [
                         Text(
                           comment.username,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
+                          style: commentsTextStyle.commentUsername(
                             color: commentsTheme.mainText,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           comment.content,
-                          style: TextStyle(color: commentsTheme.mainText),
+                          style: commentsTextStyle.commentBody(
+                            color: commentsTheme.mainText,
+                          ),
                         ),
                         const SizedBox(height: 4),
                         if (widget.featureChecker.commentHasFeature(
@@ -173,8 +182,7 @@ class _CommentTileState extends State<CommentTile> {
                             onTap: widget.onReply,
                             child: Text(
                               loc.answer,
-                              style: TextStyle(
-                                fontSize: 12,
+                              style: commentsTextStyle.replyAction(
                                 color: commentsTheme.minorText,
                               ),
                             ),
@@ -185,18 +193,22 @@ class _CommentTileState extends State<CommentTile> {
                   const SizedBox(width: 8),
                   if (widget.featureChecker.commentHasInsight(ModuleInsight.likeCount))
                     IconButton(
+                      visualDensity: VisualDensity.compact,
+                      iconSize: likeSize,
                       icon: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
                             comment.isLiked == true
                                 ? Icons.favorite
                                 : Icons.favorite_border,
+                            size: likeSize,
                             color: comment.isLiked == true ? commentsTheme.likeColor : commentsTheme.minorText,
                           ),
                           Text(
                             comment.likeCount?.toString() ?? '',
-                            style: TextStyle(
-                              fontSize: 10,
+                            textAlign: TextAlign.center,
+                            style: commentsTextStyle.likeCount(
                               color: commentsTheme.minorText,
                             ),
                           ),
